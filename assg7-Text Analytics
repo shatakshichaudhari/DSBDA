@@ -1,0 +1,190 @@
+import math
+%matplotlib inline
+import nltk
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('stopwords')
+nltk.download('wordnet')
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+
+
+def readFromFile(filename):
+  with open(filename, 'r') as file:
+      return file.read()
+
+file1 = readFromFile('1.txt').lower()
+file2 = readFromFile('2.txt').lower()
+file3 = readFromFile('3.txt').lower()
+file4 = readFromFile('4.txt').lower()
+file5 = readFromFile('5.txt').lower()
+file6 = readFromFile('6.txt').lower()
+file7 = readFromFile('7.txt').lower()
+file8 = readFromFile('8.txt').lower()
+file9 = readFromFile('9.txt').lower()
+file10 = readFromFile('10.txt').lower()
+
+Tokenization
+import string
+def tokenize(sentence: str):
+    punctuation = string.punctuation + '[]{}()<>'
+    for char in punctuation:
+        sentence = sentence.replace(char, " ")
+    sentence = sentence.lower()
+    tokens = sentence.split()
+    return tokens
+tokens1 = tokenize(file1)
+tokens2 = tokenize(file2)
+tokens3 = tokenize(file3)
+tokens4 = tokenize(file4)
+tokens5 = tokenize(file5)
+tokens6 = tokenize(file6)
+tokens7 = tokenize(file7)
+tokens8 = tokenize(file8)
+tokens9 = tokenize(file9)
+tokens10 = tokenize(file10)
+tokens10
+
+
+Stop Words Removal
+def removeStopWords(token):
+  stop_words = set(stopwords.words('english'))
+  filtered_sentence=[word for word in token if not word in stop_words]
+
+  return filtered_sentence
+
+filtered_sentence1 = removeStopWords(tokens1)
+filtered_sentence2 = removeStopWords(tokens2)
+filtered_sentence3 = removeStopWords(tokens3)
+filtered_sentence4 = removeStopWords(tokens4)
+filtered_sentence5 = removeStopWords(tokens5)
+filtered_sentence6 = removeStopWords(tokens6)
+filtered_sentence7 = removeStopWords(tokens7)
+filtered_sentence8 = removeStopWords(tokens8)
+filtered_sentence9 = removeStopWords(tokens9)
+filtered_sentence10 = removeStopWords(tokens10)
+filtered_sentence1
+
+
+
+Stemming and Lemmatization
+lemmatizer = WordNetLemmatizer()
+stemmer = PorterStemmer()
+def lemmatizationAndStemming(tokens):
+  lemmatized_tokens = [lemmatizer.lemmatize(token) for token in tokens]
+  stemmed_tokens = [stemmer.stem(token) for token in tokens]
+  return lemmatized_tokens, stemmed_tokens
+nltk.download('omw-1.4')
+
+
+lemmatized_tokens1, stemmed_tokens1 = lemmatizationAndStemming(filtered_sentence1)
+lemmatized_tokens2, stemmed_tokens2 = lemmatizationAndStemming(filtered_sentence2)
+lemmatized_tokens3, stemmed_tokens3 = lemmatizationAndStemming(filtered_sentence3)
+lemmatized_tokens4, stemmed_tokens4 = lemmatizationAndStemming(filtered_sentence4)
+lemmatized_tokens5, stemmed_tokens5 = lemmatizationAndStemming(filtered_sentence5)
+lemmatized_tokens6, stemmed_tokens6 = lemmatizationAndStemming(filtered_sentence6)
+lemmatized_tokens7, stemmed_tokens7 = lemmatizationAndStemming(filtered_sentence7)
+lemmatized_tokens8, stemmed_tokens8 = lemmatizationAndStemming(filtered_sentence8)
+lemmatized_tokens9, stemmed_tokens9 = lemmatizationAndStemming(filtered_sentence9)
+lemmatized_tokens10, stemmed_tokens10 = lemmatizationAndStemming(filtered_sentence10)
+
+print("Lemmatized tokens:\n")
+print(lemmatized_tokens1)
+print("----------------------------------------")
+print("Stemmed tokens:\n")
+print(stemmed_tokens1)
+
+
+Analyzing the Text
+def TF(doc):
+  dic = {}
+
+  for word in doc:
+    if word in dic:
+        dic[word]+=1
+    else:
+        dic[word]=1
+
+  lengthOfDocument = len(doc)
+  print("Lenght of document is: ",lengthOfDocument, end = "\n\n")
+  for word,freq in dic.items():
+        print(word,freq)
+        dic[word]=freq/lengthOfDocument
+
+  return dic
+tf1 = TF(lemmatized_tokens1)
+tf2 = TF(lemmatized_tokens2)
+tf3 = TF(lemmatized_tokens3)
+tf4 = TF(lemmatized_tokens4)
+tf5 = TF(lemmatized_tokens5)
+tf6 = TF(lemmatized_tokens6)
+tf7 = TF(lemmatized_tokens7)
+tf8 = TF(lemmatized_tokens8)
+tf9 = TF(lemmatized_tokens9)
+tf10 = TF(lemmatized_tokens10)
+
+
+tf1
+
+uniqueWords = set()
+def calculateIDF(dicList):
+  docListLength = len(dicList)
+  idf = {}
+
+  for dic in dicList:
+    for word in dic.keys():
+      uniqueWords.add(word)
+  print(uniqueWords)
+
+  for word in uniqueWords:
+    for dic in dicList:
+      if word in dic:
+        if word in idf:
+          idf[word] += 1
+        else:
+          idf[word] = 1
+
+  for word in idf.keys():
+    idf[word] = math.log10(docListLength / idf[word])
+
+  return idf
+
+
+
+idf = calculateIDF([tf1,tf2,tf3,tf4,tf5,tf6,tf7,tf8,tf9,tf10])
+print(idf)
+
+
+def calculateTFIDF(tf, idf):
+  w = {}
+  for word in tf.keys():
+    w[word] = tf[word] * idf[word]
+  return w
+w1 = calculateTFIDF(tf1, idf)
+w2 = calculateTFIDF(tf2, idf)
+w3 = calculateTFIDF(tf3, idf)
+w4 = calculateTFIDF(tf4, idf)
+w5 = calculateTFIDF(tf5, idf)
+w6 = calculateTFIDF(tf6, idf)
+w7 = calculateTFIDF(tf7, idf)
+w8 = calculateTFIDF(tf8, idf)
+w9 = calculateTFIDF(tf9, idf)
+w10 = calculateTFIDF(tf10, idf)
+weights = [w1,w2,w3,w4,w5,w6,w7,w8,w9,w10]
+print(w1)
+
+print(' '*20, end = '')
+for i in range(10):
+  print("D{}".format(i+1), ' '*(10),end = ' ')
+print()
+
+for word in uniqueWords:
+  print(word, ' '*(20-len(word)), end = '')
+  for w in weights:
+    if word in w:
+      print(w[word], end = ' ')
+    else:
+      print(' '*10, end = ' ')
+  print()
+
+
