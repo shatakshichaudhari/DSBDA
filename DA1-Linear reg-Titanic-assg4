@@ -1,0 +1,136 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler
+import numpy as np
+df = sns.load_dataset('titanic')
+df.head()
+
+df.describe()
+df.shape
+df.isnull().sum()
+df.dtypes
+
+Data Preprocessing
+# Removing unnecessary column
+df.drop(['who', 'alive'], axis=1, inplace=True)
+df['adult_male'].unique()
+array([ True, False])
+df.drop(['adult_male'], axis=1, inplace=True)
+df.head()
+
+# Replacing Categorical Values to Quantitative
+df['sex'].replace(to_replace='male', value=1, inplace=True)
+df['sex'].replace(to_replace='female', value=0, inplace=True)
+df.head()
+
+# Replacing Missing ages with mean value
+mean_age = df['age'].mean()
+
+df['age'].fillna(mean_age, inplace=True)
+Data Visualization
+sns.set_style('whitegrid')
+plt.figure(figsize=(10, 6))
+
+plt.hist(df['fare'], bins=20, color='skyblue', edgecolor='black')
+
+plt.title('Distribution of Ticket Prices')
+plt.xlabel('Fare')
+plt.ylabel('Frequency')
+
+plt.show()
+
+sns.set_style('whitegrid')
+plt.figure(figsize=(10, 6))
+
+sns.histplot(data=df, x='age')
+
+# Removing the outliers
+plt.figure(figsize=(6, 8))
+sns.boxplot(y=df['fare'])
+plt.ylabel('fare')
+plt.title('Boxplot of Fare')
+plt.show()
+
+# Calculate IQR
+Q1 = df['fare'].quantile(0.25)
+Q3 = df['fare'].quantile(0.75)
+IQR = Q3 - Q1
+
+# Define limits to identify outliers
+lower_limit = Q1 - 1.5 * IQR
+upper_limit = Q3 + 1.5 * IQR
+
+outliers = df[(df['fare'] < lower_limit) | (df['fare'] > upper_limit)]
+
+# Count the number of outliers
+num_outliers = len(outliers)
+print(num_outliers)
+
+
+# Remove outliers
+data = df[(df['fare'] >= lower_limit) & (df['fare'] <= upper_limit)]
+
+# Create a boxplot again without outliers
+plt.figure(figsize=(6, 8))
+sns.boxplot(y=data['fare'])
+plt.ylabel('fare')
+plt.title('Boxplot of SalePrice without outliers')
+plt.show()
+
+df.head()
+
+sns.countplot(x='pclass', data=df)
+df['sex'].replace(to_replace=1, value='male', inplace=True)
+df['sex'].replace(to_replace=0, value='female', inplace=True)
+sns.histplot(data=df, x="sex")
+
+sns.barplot(x='sex', y='survived', data=df)
+
+sns.barplot(x='pclass', y='survived',data=df)
+
+
+# Boxplot of pclass vs fare
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='pclass', y='fare', data=df)
+
+
+# Boxplot of pclass vs age
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='pclass', y='age', data=df)
+
+# Boxplot of pclass vs ags and hue = survived
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='pclass', y='age', hue='survived', data=df)
+
+
+# Boxplot of sex vs age and hue = survived
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='sex', y='age', hue='survived', data=df)
+
+sns.violinplot(x=df['pclass'], y=df['age'], hue=df['survived'], split=True, inner='quartile')
+
+3D Visualization
+from mpl_toolkits.mplot3d import Axes3D
+x_column = 'age'
+y_column = 'fare'
+z_column = 'pclass'
+
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(df[x_column], df[y_column], df[z_column], c='blue', marker='o', alpha=0.5)
+
+ax.set_xlabel(x_column)
+ax.set_ylabel(y_column)
+ax.set_zlabel(z_column)
+
+ax.set_title('3D Scatter Plot for Titanic Data')
+
+plt.show()
+
+
+
