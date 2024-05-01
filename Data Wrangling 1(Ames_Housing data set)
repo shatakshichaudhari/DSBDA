@@ -1,0 +1,132 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler
+import numpy as np
+
+Loading Data
+data = pd.read_csv('Ames_Housing_Data.csv')
+
+Preprocessing Data
+data.head()
+
+data.shape
+
+data.describe()
+
+data.isna()
+
+missing_values = data.isnull().sum()
+print(missing_values)
+
+# Filling Null Values
+data['Lot Frontage'].fillna(value=data['Lot Frontage'].mean(), inplace=True)
+missing_values = data.isnull().sum()
+print(missing_values)
+
+data.dtypes
+
+
+Data Formatting and Data Normalization
+# Replacinf Categorical Data to Quantitative Data
+data['Alley'].unique()
+
+data['Alley'].fillna(-1, inplace=True)
+data['Alley'].replace(to_replace=-1, value=0, inplace=True)
+data['Alley'].replace(to_replace='Pave', value=1, inplace=True)
+data['Alley'].replace(to_replace='Grvl', value=2, inplace=True)
+
+data['Alley'].unique()
+
+data['Alley'].dtype
+data.head()
+
+
+data['Street'].unique()
+data['Street'].dtype
+
+data['Street'].replace(to_replace='Pave', value=0, inplace=True)
+data['Street'].replace(to_replace='Grvl', value=1, inplace=True)
+
+data['Street'].unique()
+
+data['Street'].dtype
+
+data.head()
+
+Data Visualization
+sns.set_style('whitegrid')
+plt.hist(data['SalePrice'])
+
+data['SalePrice'].mean()
+
+
+Data Normalised
+min_value = data['SalePrice'].min()
+max_value = data['SalePrice'].max()
+
+print(min_value)
+print(max_value)
+
+# MinMax Scaler Normalization
+
+salePrice = data['SalePrice'].values.reshape(-1, 1)
+
+scaler = MinMaxScaler()
+
+normalizedData = scaler.fit_transform(salePrice)
+
+sns.set_style('whitegrid')
+plt.hist(normalizedData, bins=20)  
+plt.xlabel('Normalized SalePrice')
+plt.ylabel('Frequency')
+plt.title('Histogram of Normalized SalePrice')
+plt.show()
+
+print("Min normalized value:", normalizedData.min())
+print("Max normalized value:", normalizedData.max())
+
+plt.hist(data['SalePrice'], bins=20)
+
+# Logarithmic Normalization
+
+data['LogSalePrice'] = np.log1p(data['SalePrice'])
+
+
+sns.set_style('whitegrid')
+plt.hist(data['LogSalePrice'], bins=20) 
+plt.xlabel('Logarithm of SalePrice')
+plt.ylabel('Frequency')
+plt.title('Histogram of Logarithm of SalePrice')
+plt.show()
+
+
+# IQR Method of Removing Outliers
+
+plt.figure(figsize=(6, 8))
+sns.boxplot(y=data['SalePrice'])
+plt.ylabel('SalePrice')
+plt.title('Boxplot of SalePrice')
+plt.show()
+
+# Calculate IQR
+Q1 = data['SalePrice'].quantile(0.25)
+Q3 = data['SalePrice'].quantile(0.75)
+IQR = Q3 - Q1
+
+# Define limits to identify outliers
+lower_limit = Q1 - 1.5 * IQR
+upper_limit = Q3 + 1.5 * IQR
+
+# Remove outliers
+data = data[(data['SalePrice'] >= lower_limit) & (data['SalePrice'] <= upper_limit)]
+
+# Create a boxplot again without outliers
+plt.figure(figsize=(6, 8))
+sns.boxplot(y=data['SalePrice'])
+plt.ylabel('SalePrice')
+plt.title('Boxplot of SalePrice without outliers')
+plt.show()
+
+
+
