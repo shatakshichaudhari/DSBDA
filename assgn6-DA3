@@ -1,0 +1,62 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+df = pd.read_csv('Iris.csv')
+df.head()
+
+df.describe()
+
+df.isnull().sum()
+
+
+# List down the features and their types (e.g., numeric, nominal) available in the dataset.
+df.dtypes
+
+df1 = df.drop(['Id', 'Species'], axis=1)
+# Create a histogram for each feature in the dataset to illustrate the feature distributions.
+
+def createHistogram(columnName, df):
+    sns.set_style("whitegrid")
+    plt.hist(df[columnName], bins=20)
+    plt.xlabel(columnName)
+    plt.ylabel('Count')
+
+for col in df1:
+    fig, axes = plt.subplots(1,1, figsize=(8,6))
+    createHistogram(col, df1)
+
+
+# Create a box plot for each feature in the dataset. Compare distributions and identify outliers.
+
+def createBoxPlot(columnName, df):
+    # plt.figure(figsize=(6,8))
+    sns.boxplot(y=df[columnName])
+    plt.ylabel(columnName)
+    plt.title('Boxplot of '+ columnName)
+    plt.show()
+
+    # Calculate IQR
+    Q1 = df[columnName].quantile(0.25)
+    Q3 = df[columnName].quantile(0.75)
+    IQR = Q3 - Q1
+
+    # Define limits to identify outliers
+    lower_limit = Q1 - 1.5 * IQR
+    upper_limit = Q3 + 1.5 * IQR
+    
+    # Count the number of outliers
+    outliers = df[(df[columnName] < lower_limit) | (df[columnName] > upper_limit)]
+    num_outliers = len(outliers)
+    print(num_outliers)
+
+    # Remove outliers
+    df = df[(df[columnName] >= lower_limit) & (df[columnName] <= upper_limit)]
+
+    # Create a boxplot again without outliers
+    # plt.figure(figsize=(6, 8))
+    sns.boxplot(y=df[columnName])
+    plt.ylabel(columnName)
+    plt.title('Boxplot of ' + columnName + ' without outliers')
+    plt.show()
+for col in df1:
+    createBoxPlot(col, df1)
