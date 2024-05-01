@@ -1,0 +1,160 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler
+import numpy as np
+
+df = pd.read_csv('StudentsPerformance.csv')
+df.head()
+df.describe()
+df.isnull().sum()
+df.dtypes
+
+
+Date Preprocessing
+Filing Missing/Null Values
+Maths Score
+# Processing Math Score Values
+
+df['math score'].fillna(-1, inplace=True)
+df['math score'].unique()
+
+
+df['math score'].replace(to_replace='?', value=-1, inplace=True)
+df['math_score_float'] = df['math score'].astype(float).round(2)
+df['math_score_float'].mean()
+
+df['math_score_float'].replace(to_replace=-1, value=0, inplace=True)
+df['math_score_float'].mean()
+
+df['math_score_float'].replace(to_replace=0, value=63.47, inplace=True)
+df.head()
+
+Reading Score
+df['reading score'].isnull().sum()
+
+df['reading score'].mean()
+df['reading score'].unique()
+
+df['reading score'].fillna(0, inplace=True)
+df['reading score'].unique()
+
+df['reading score'].replace(to_replace=0, value=68, inplace=True)
+Writing Score
+df['writing score'].mean()
+69.48738647830474
+df['writing score'].fillna(0, inplace=True)
+df['writing score'].replace(to_replace=0, value=69.48, inplace=True)
+df.isnull().sum()
+
+
+Outliers
+# IQR Method of Removing Outliers
+
+plt.figure(figsize=(6, 8))
+sns.boxplot(y=df['math_score_float'])
+plt.ylabel('math_score_float')
+plt.title('Boxplot of math')
+plt.show()
+
+# Calculate IQR
+Q1 = df['math_score_float'].quantile(0.25)
+Q3 = df['math_score_float'].quantile(0.75)
+IQR = Q3 - Q1
+
+# Define limits to identify outliers
+lower_limit = Q1 - 1.5 * IQR
+upper_limit = Q3 + 1.5 * IQR
+
+# Remove outliers
+df = df[(df['math_score_float'] >= lower_limit) & (df['math_score_float'] <= upper_limit)]
+
+# Create a boxplot again without outliers
+plt.figure(figsize=(6, 8))
+sns.boxplot(y=df['math_score_float'])
+plt.ylabel('math_score_float')
+plt.title('Boxplot of SalePrice without outliers')
+plt.show()
+
+
+plt.figure(figsize=(6, 8))
+sns.boxplot(y=df['reading score'])
+plt.ylabel('reading score')
+plt.title('Boxplot of reading score')
+plt.show()
+
+# Calculate IQR
+Q1 = df['reading score'].quantile(0.25)
+Q3 = df['reading score'].quantile(0.75)
+IQR = Q3 - Q1
+
+# Define limits to identify outliers
+lower_limit = Q1 - 1.5 * IQR
+upper_limit = Q3 + 1.5 * IQR
+
+# Remove outliers
+df = df[(df['reading score'] >= lower_limit) & (df['reading score'] <= upper_limit)]
+
+# Create a boxplot again without outliers
+plt.figure(figsize=(6, 8))
+sns.boxplot(y=df['reading score'])
+plt.ylabel('reading score')
+plt.title('Boxplot of SalePrice without outliers')
+plt.show()
+
+
+plt.figure(figsize=(6, 8))
+sns.boxplot(y=df['writing score'])
+plt.ylabel('writing score')
+plt.title('Boxplot of writing score')
+plt.show()
+
+# Calculate IQR
+Q1 = df['writing score'].quantile(0.25)
+Q3 = df['writing score'].quantile(0.75)
+IQR = Q3 - Q1
+
+# Define limits to identify outliers
+lower_limit = Q1 - 1.5 * IQR
+upper_limit = Q3 + 1.5 * IQR
+
+# Remove outliers
+df = df[(df['writing score'] >= lower_limit) & (df['writing score'] <= upper_limit)]
+
+# Create a boxplot again without outliers
+plt.figure(figsize=(6, 8))
+sns.boxplot(y=df['writing score'])
+plt.ylabel('writing score')
+plt.title('Boxplot of SalePrice without outliers')
+plt.show()
+
+
+Data Transformation
+fig, axes = plt.subplots(1,3, figsize=(15,5))
+
+sns.distplot(df['writing score'], ax=axes[0])
+axes[0].axvline(df['writing score'].mean(), color='r', linestyle='--')
+
+sns.distplot(df['reading score'], ax=axes[1])
+axes[1].axvline(df['reading score'].mean(), color='r', linestyle='--')
+
+sns.distplot(df['math_score_float'], ax=axes[2])
+axes[2].axvline(df['math_score_float'].mean(), color='r', linestyle='--')
+
+plt.show()
+
+
+# Z-Score method of standardization
+
+avg_write = df['writing score'].mean()
+
+std_write = df['writing score'].std()
+
+df['Z_Score_Write'] = (df['writing score'] - avg_write)/std_write
+
+fig, axes = plt.subplots(1,2, figsize=(15,5))
+
+sns.distplot(df['writing score'], ax=axes[0])
+sns.distplot(df['Z_Score_Write'], ax=axes[1])
+
+
